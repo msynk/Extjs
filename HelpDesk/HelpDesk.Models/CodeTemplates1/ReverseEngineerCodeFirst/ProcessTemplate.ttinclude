@@ -1,0 +1,72 @@
+<#@ template language="C#" hostspecific="True" #>
+<#@ assembly name="EnvDTE" #>
+<#@ assembly name="EnvDTE80" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="Microsoft.VisualStudio.TextTemplating" #>
+<#+
+  void Generate(string entityName)
+  {
+	var produectName = "Avrin.TCS";
+    #region Variables Initialization
+
+    var dte2 = (EnvDTE80.DTE2)System.Runtime.InteropServices.Marshal.GetActiveObject("VisualStudio.DTE.10.0");
+    var solution = dte2.Solution;
+    var solutipnPath = Path.GetDirectoryName(solution.FileName);
+    
+    var ttPath = Path.Combine(solutipnPath , produectName + @".DomainModels\CodeTemplates\ReverseEngineerCodeFirst");
+    var ttBllPath = Path.Combine(ttPath , "BLL");
+    var ttDalPath = Path.Combine(ttPath , "DAL");
+
+    var bloPath = Path.Combine(solutipnPath , produectName + @".BLL\BLOs");
+    var dtoPath = Path.Combine(solutipnPath , produectName + @".BLL\DTOs");
+    var servicePath = Path.Combine(solutipnPath , produectName + @".DAL\Services\Implementations\EF");
+    var iServicePath = Path.Combine(solutipnPath , produectName + @".DAL\Services\Interfaces");
+
+    var entityBloPath = Path.Combine(bloPath , entityName + "BLO.cs");
+    var entityBloGenPath = Path.Combine(bloPath , entityName + "BLO.generated.cs");
+    var entityDtoPath = Path.Combine(dtoPath , entityName + "DTO.cs");
+    var entityDtoGenPath = Path.Combine(dtoPath , entityName + "DTO.generated.cs");
+    var entityServPath = Path.Combine(servicePath , entityName + "Service.cs");
+    var entityServGenPath = Path.Combine(servicePath , entityName + "Service.generated.cs");
+    var iEntityServPath = Path.Combine(iServicePath , "I" + entityName + "Service.cs");
+
+    #endregion
+
+    #region Files Generation
+
+    ProcessTemplate(Path.Combine(ttBllPath , "EntityBLO.tt"), entityBloPath);
+    ProcessTemplate(Path.Combine(ttBllPath , "EntityBLO.generated.tt"), entityBloGenPath);
+
+    ProcessTemplate(Path.Combine(ttBllPath , "EntityDTO.tt"), entityDtoPath);
+    ProcessTemplate(Path.Combine(ttBllPath , "EntityDTO.generated.tt"), entityDtoGenPath);
+
+    ProcessTemplate(Path.Combine(ttDalPath , "EntityService.tt"), entityServPath);
+    ProcessTemplate(Path.Combine(ttDalPath , "EntityService.generated.tt"), entityServGenPath);
+    ProcessTemplate(Path.Combine(ttDalPath , "IEntityService.tt"), iEntityServPath);
+
+    #endregion
+  
+    #region File Addin to Projects
+
+    var bllProject = solution.Projects.Cast<EnvDTE.Project>().Single(proj => proj.Name == produectName + ".BLL");
+    var bloItem = bllProject.ProjectItems.AddFromFile(entityBloPath);
+    bloItem.ProjectItems.AddFromFile(entityBloGenPath);
+    var dtoItem = bllProject.ProjectItems.AddFromFile(entityDtoPath);
+    dtoItem.ProjectItems.AddFromFile(entityDtoGenPath);
+
+    var dalProject = solution.Projects.Cast<EnvDTE.Project>().Single(proj => proj.Name == produectName + ".DAL");
+    var serviceItem = dalProject.ProjectItems.AddFromFile(entityServPath);
+    serviceItem.ProjectItems.AddFromFile(entityServGenPath);
+    var iServiceItem = dalProject.ProjectItems.AddFromFile(iEntityServPath);
+
+    #endregion
+  }
+
+  void ProcessTemplate(string templateFileName, string outputFileName)
+  {
+    var template = File.ReadAllText(Host.ResolvePath(templateFileName));
+    var engine = new Engine();
+    var output = engine.ProcessTemplate(template, Host);  
+    File.WriteAllText(outputFileName, output);
+  }
+#>

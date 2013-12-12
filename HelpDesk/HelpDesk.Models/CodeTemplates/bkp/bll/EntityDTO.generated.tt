@@ -1,0 +1,36 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ parameter name="dtoNS" type="System.String" #>
+<#@ parameter name="modelsNS" type="System.String" #>
+<#@ parameter name="dto" type="System.String" #>
+<#@ parameter name="efHost" type="Microsoft.DbContextPackage.Utilities.EfTextTemplateHost" #>
+<#
+  //var efHost = (EfTextTemplateHost)Host;
+  var entityName = efHost.EntityType.Name;
+  var entityLowerName = entityName.ToLower();
+  
+  var entityDto = entityName + dto;
+#>
+using System.Collections.Generic;
+using <#= modelsNS #>.Models;
+
+namespace <#= dtoNS #>
+{
+	public partial class <#= entityDto #>
+  {
+    public static <#= entityDto #> From<#= entityName #>(<#= entityName #> entity)
+    {
+      return new <#= entityDto #>();
+    }
+
+    public static IList<<#= entityDto #>> From<#= entityName #>s(IList<<#= entityName #>> entities)
+    {
+      return new List<<#= entityDto #>>();
+    }
+
+    public static <#= entityName #> To<#= entityName #>(<#= entityDto #> dto)
+    {
+      return new <#= entityName #>();
+    }
+  }
+}

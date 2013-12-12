@@ -1,0 +1,128 @@
+﻿<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ parameter name="dalNS" type="System.String" #>
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
+using System.Linq.Expressions;
+using <#= dalNS #>.Services.Interfaces.Base;
+
+namespace <#= dalNS #>.Services.Implementations.EF.Base
+{
+  public class DbServiceBase<T> : IDbService<T> where T : class
+  {
+    private readonly IUnitOfWork _uow;
+    private readonly IDbSet<T> _repository;
+
+    protected IUnitOfWork Uow { get { return _uow; } }
+    protected IDbSet<T> Repository { get { return _repository; } }
+
+    public DbServiceBase(IUnitOfWork uow)
+    {
+      _uow = uow;
+      _repository = uow.Set<T>();
+    }
+
+    public IQueryable<T> Query
+    {
+      get { return _repository.AsNoTracking(); }
+    }
+
+    public IQueryable<T> QueryForEdit
+    {
+      get { return _repository.AsQueryable(); }
+    }
+
+    public IList<T> Get()
+    {
+      return _repository.AsNoTracking().ToList();
+    }
+
+    public IList<T> Get(Expression<Func<T, bool>> predicate)
+    {
+      return _repository.Where(predicate).AsNoTracking().ToList();
+    }
+
+    public IList<T> Get(string path)
+    {
+      return _repository.Include(path).AsNoTracking().ToList();
+    }
+
+    public IList<T> Get<TProperty>(Expression<Func<T, TProperty>> path)
+    {
+      return _repository.Include(path).AsNoTracking().ToList();
+    }
+
+    public IList<T> Get(string path, Expression<Func<T, bool>> predicate)
+    {
+      return _repository.Include(path).Where(predicate).AsNoTracking().ToList();
+    }
+
+    public IList<T> Get<TProperty>(Expression<Func<T, TProperty>> path, Expression<Func<T, bool>> predicate)
+    {
+      return _repository.Include(path).Where(predicate).AsNoTracking().ToList();
+    }
+
+    public IList<T> Get<TProperty>(Expression<Func<T, bool>> predicate, Expression<Func<T, TProperty>> path, params Expression<Func<T, TProperty>>[] paths)
+    {
+      var query = _repository.Include(path);
+      query = paths.Aggregate(query, (current, p) => current.Include(p));
+      return query.Where(predicate).AsNoTracking().ToList();
+    }
+
+
+
+    public IList<T> GetForEdit()
+    {
+      return _repository.ToList();
+    }
+
+    public IList<T> GetForEdit(Expression<Func<T, bool>> predicate)
+    {
+      return _repository.Where(predicate).ToList();
+    }
+
+    public IList<T> GetForEdit(string path)
+    {
+      return _repository.Include(path).ToList();
+    }
+
+    public IList<T> GetForEdit<TProperty>(Expression<Func<T, TProperty>> path)
+    {
+      return _repository.Include(path).ToList();
+    }
+
+    public IList<T> GetForEdit(string path, Expression<Func<T, bool>> predicate)
+    {
+      return _repository.Include(path).Where(predicate).ToList();
+    }
+
+    public IList<T> GetForEdit<TProperty>(Expression<Func<T, TProperty>> path, Expression<Func<T, bool>> predicate)
+    {
+      return _repository.Include(path).Where(predicate).ToList();
+    }
+
+    public IList<T> GetForEdit<TProperty>(Expression<Func<T, bool>> predicate, Expression<Func<T, TProperty>> path, params Expression<Func<T, TProperty>>[] paths)
+    {
+      var query = _repository.Include(path);
+      query = paths.Aggregate(query, (current, p) => current.Include(p));
+      return query.Where(predicate).ToList();
+    }
+
+    public T Add(T entity)
+    {
+      return _repository.Add(entity);
+    }
+
+    public void Edit(T entity)
+    {
+      _uow.Modify(entity);
+    }
+
+    public void Delete(T entity)
+    {
+      _repository.Remove(entity);
+    }
+  }
+}

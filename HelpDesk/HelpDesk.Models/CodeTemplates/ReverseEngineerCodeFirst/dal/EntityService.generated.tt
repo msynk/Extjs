@@ -1,0 +1,41 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ parameter name="dalNS" type="System.String" #>
+<#@ parameter name="modelsNS" type="System.String" #>
+<#@ parameter name="efHost" type="Microsoft.DbContextPackage.Utilities.EfTextTemplateHost" #>
+<#
+  //var efHost = (EfTextTemplateHost)Host;
+  var entityName = efHost.EntityType.Name;
+#>
+using System.Linq;
+using System.Data.Entity;
+using <#= dalNS #>.Services.Implementations.EF.Base;
+using <#= dalNS #>.Services.Interfaces;
+using <#= dalNS #>.Services.Interfaces.Base;
+using <#= modelsNS #>.Models;
+
+namespace <#= dalNS #>.Services.Implementations.EF
+{
+	public partial class <#= entityName #>Service : DbServiceBase<<#= entityName #>>, I<#= entityName #>Service
+  {
+    public <#= entityName #>Service(IUnitOfWork uow) : base(uow)
+    {
+    }
+
+    public <#= entityName #> Get(long id)
+    {
+      return Repository.AsNoTracking().Single(p => p.Id == id);
+    }
+
+    public <#= entityName #> GetForEdit(long id)
+    {
+      return Repository.Single(p => p.Id == id);
+    }
+
+    public void Delete(long id)
+    {
+      var entity = GetForEdit(id);
+      Delete(entity);
+    }
+  }
+}

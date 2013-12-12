@@ -1,0 +1,44 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ parameter name="dalNS" type="System.String" #>
+<#@ parameter name="efHost" type="Microsoft.DbContextPackage.Utilities.EfTextTemplateHost" #>
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
+using <#= dalNS #>.Services.Interfaces.Base;
+
+namespace <#= dalNS #>.Contexts
+{
+  public partial class <#= efHost.EntityContainer.Name #> : IUnitOfWork
+  {
+    #region IUnitOfWork Members
+
+    public new IDbSet<TEntity> Set<TEntity>() where TEntity : class
+    {
+      return base.Set<TEntity>();
+    }
+
+    public void Modify(object entity)
+    {
+      Entry(entity).State = EntityState.Modified;
+    }
+
+    public override int SaveChanges()
+    {
+      try
+      {
+        return base.SaveChanges();
+      }
+      catch (System.Data.Entity.Validation.DbEntityValidationException ex)
+      {
+        var exception = new Exception("A DbEntityValidationException occured.", ex);
+        exception = ex.EntityValidationErrors.Aggregate(exception, (exc, result) => result.ValidationErrors.Aggregate(exc, (current, error) => new Exception(error.ErrorMessage, current)));
+        throw exception;
+      }
+    }
+
+    #endregion
+  }
+}

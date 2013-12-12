@@ -1,0 +1,15 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ parameter name="bloNS" type="System.String" #>
+<#@ parameter name="blo" type="System.String" #>
+<#@ parameter name="efHost" type="Microsoft.DbContextPackage.Utilities.EfTextTemplateHost" #>
+<#
+  //var efHost = (EfTextTemplateHost)Host;
+  string entityName = efHost.EntityType.Name;
+#>
+namespace <#= bloNS #>
+{
+	public partial class <#= entityName + blo #>
+  {
+  }
+}

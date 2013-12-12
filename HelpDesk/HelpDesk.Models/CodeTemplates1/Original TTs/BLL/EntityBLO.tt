@@ -1,0 +1,21 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ include file="EF.Utility.CS.ttinclude" #>
+<#@ output extension=".cs" #>
+<#
+  var efHost = (EfTextTemplateHost)Host;
+  string entityName = efHost.EntityType.Name;
+  string entityLowerName = entityName.ToLower();
+#>
+using System.Collections.Generic;
+using Avrin.TCS.BLL.BLOs.Bases;
+using Avrin.TCS.BLL.DTOs;
+using Avrin.TCS.DAL.Services.Interfaces;
+using Avrin.TCS.DAL.Services.Interfaces.Bases;
+using Avrin.TCS.DomainModels.Models;
+
+namespace Avrin.TCS.BLL.BLOs
+{
+	public partial class <#= entityName #>BLO
+  {
+  }
+}

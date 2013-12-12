@@ -1,0 +1,14 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ parameter name="dalNS" type="System.String" #>
+<#@ parameter name="efHost" type="Microsoft.DbContextPackage.Utilities.EfTextTemplateHost" #>
+<#
+  //var efHost = (EfTextTemplateHost)Host;
+  var entityName = efHost.EntityType.Name;
+#>
+namespace <#= dalNS #>.Services.Implementations.EF
+{
+	public partial class <#= entityName #>Service
+  {
+  }
+}

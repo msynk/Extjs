@@ -1,0 +1,12 @@
+﻿<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ parameter name="dalNS" type="System.String" #>
+namespace <#= dalNS #>.Services.Interfaces.Base
+{
+  public interface IRepositoryService<T> : IDbService<T> where T : class
+  {
+    T Get(long id);
+    T GetForEdit(long id);
+    void Delete(long id);
+  }
+}
