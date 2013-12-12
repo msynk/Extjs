@@ -76,6 +76,7 @@
     <Content Include="js\app\view\shared\InfoView.js" />
     <Content Include="js\app\view\Viewport.js" />
     <Content Include="js\empty.js" />
+    <Content Include="js\extjs\ext-all-dev.js" />
     <Content Include="Resources\images\extanim32.gif" />
     <Content Include="Resources\Site.css" />
     <Content Include="Web.config" />
